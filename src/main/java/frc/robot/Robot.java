@@ -12,16 +12,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
+  public static OI oi;
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private String autoSelected;
+  private final SendableChooser<String> chooser = new SendableChooser<>();
 
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
+    oi = new OI();
+    chooser.setDefaultOption("Default Auto", kDefaultAuto);
+    chooser.addOption("My Auto", kCustomAuto);
+    SmartDashboard.putData("Auto choices", chooser);
+    frc.robot.subsystems.Drivetrain.DrivetrainSetup();
   }
 
   @Override
@@ -30,14 +33,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+    autoSelected = chooser.getSelected();
+    // autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    System.out.println("Auto selected: " + autoSelected);
   }
 
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
+    switch (autoSelected) {
       case kCustomAuto:
         // Put custom auto code here
         break;
@@ -50,6 +53,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    frc.robot.subsystems.Drivetrain.drive.arcadeDrive(Robot.oi.getJoystickY(), Robot.oi.getJoystickX());
   }
 
   @Override

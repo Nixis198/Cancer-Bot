@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import frc.robot.Robot;
 import frc.robot.RobotMap;
 
 public class Drivetrain {  
@@ -31,5 +30,12 @@ public class Drivetrain {
         leftVictorSlave2.follow(leftVictorMaster);
 
         rightVictorMaster.setInverted(false);
+        rightVictorSlave1.setInverted(InvertType.FollowMaster);
+        rightVictorSlave2.setInverted(InvertType.FollowMaster);
+        leftVictorMaster.setInverted(false);
+        leftVictorSlave1.setInverted(InvertType.FollowMaster);
+        leftVictorSlave2.setInverted(InvertType.FollowMaster);
+
+        Drivetrain.drive.setRightSideInverted(false);
     }
 }
