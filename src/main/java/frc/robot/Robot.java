@@ -43,10 +43,16 @@ public class Robot extends TimedRobot {
     switch (autoSelected) {
       case kCustomAuto:
         // Put custom auto code here
+        AutonDriver.AutonDriveYeet(0.5, "forward", 5);
+        AutonDriver.AutonDriveYeet(1, "right", 5);
+        AutonDriver.AutonDriveYeet(1, "left", 5);
         break;
       case kDefaultAuto:
       default:
         // Put default auto code here
+        AutonDriver.AutonDriveYeet(0.5, "forward", 5);
+        AutonDriver.AutonDriveYeet(1, "right", 5);
+        AutonDriver.AutonDriveYeet(1, "left", 5);
         break;
     }
   }
