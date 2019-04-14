@@ -8,23 +8,21 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.NavX;
 
 public class Robot extends TimedRobot {
   public static OI oi;
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String autoSelected;
-  private final SendableChooser<String> chooser = new SendableChooser<>();
+
+  double leftSlow = 0.24;
+  double rightSlow = -0.24;
+  double rotateSpeed = 0.35;
+  double rotateSpeedSlow = 0.25;
 
   @Override
   public void robotInit() {
     oi = new OI();
-    chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", chooser);
     frc.robot.subsystems.Drivetrain.DrivetrainSetup();
+    frc.robot.subsystems.NavX.navXSetUp();
   }
 
   @Override
@@ -33,33 +31,57 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    autoSelected = chooser.getSelected();
-    // autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + autoSelected);
   }
 
   @Override
   public void autonomousPeriodic() {
-    switch (autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        AutonDriver.AutonDriveYeet(0.5, "forward", 5);
-        AutonDriver.AutonDriveYeet(1, "right", 5);
-        AutonDriver.AutonDriveYeet(1, "left", 5);
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        AutonDriver.AutonDriveYeet(0.5, "forward", 5);
-        AutonDriver.AutonDriveYeet(1, "right", 5);
-        AutonDriver.AutonDriveYeet(1, "left", 5);
-        break;
-    }
+    
   }
 
   @Override
   public void teleopPeriodic() {
-    frc.robot.subsystems.Drivetrain.drive.arcadeDrive(Robot.oi.getJoystickY(), Robot.oi.getJoystickX());
+    if(oi.btnGyroDrive.get()){
+      if(NavX.getNavXAngle() <= 3){
+        frc.robot.subsystems.Drivetrain.leftVictorMaster.set(leftSlow - (NavX.getNavXAngle()) / 15);
+        frc.robot.subsystems.Drivetrain.rightVictorMaster.set(rightSlow - (NavX.getNavXAngle()) / 15);
+      } else if(NavX.getNavXAngle() < 10){
+        if(NavX.getNavXAngle() > 0){
+          frc.robot.subsystems.Drivetrain.leftVictorMaster.set(leftSlow);
+          frc.robot.subsystems.Drivetrain.rightVictorMaster.set(1.1 * rightSlow);
+        } else if(NavX.getNavXAngle() < 0){
+          frc.robot.subsystems.Drivetrain.leftVictorMaster.set(1.1 * leftSlow);
+          frc.robot.subsystems.Drivetrain.rightVictorMaster.set(rightSlow);
+        }
+      } else if(NavX.getNavXAngle() > 0){
+        while(NavX.getNavXAngle() > 10 && isOperatorControl()){
+          frc.robot.subsystems.Drivetrain.leftVictorMaster.set(-rotateSpeed);
+          frc.robot.subsystems.Drivetrain.rightVictorMaster.set(-rotateSpeed);
+        }
+        while (NavX.getNavXAngle() > 0 && isOperatorControl()){
+          frc.robot.subsystems.Drivetrain.leftVictorMaster.set(-rotateSpeedSlow);
+          frc.robot.subsystems.Drivetrain.rightVictorMaster.set(-rotateSpeedSlow);
+         }
+         while (NavX.getNavXAngle() < 0 && isOperatorControl()){
+          frc.robot.subsystems.Drivetrain.leftVictorMaster.set(rotateSpeedSlow);
+          frc.robot.subsystems.Drivetrain.rightVictorMaster.set(rotateSpeedSlow);
+         }
+        } else {
+         while (NavX.getNavXAngle() < -10 && isOperatorControl()){
+          frc.robot.subsystems.Drivetrain.leftVictorMaster.set(rotateSpeed);
+          frc.robot.subsystems.Drivetrain.rightVictorMaster.set(rotateSpeed);
+         }
+         while (NavX.getNavXAngle() < 0 && isOperatorControl()){
+          frc.robot.subsystems.Drivetrain.leftVictorMaster.set(rotateSpeedSlow);
+          frc.robot.subsystems.Drivetrain.rightVictorMaster.set(rotateSpeedSlow);
+         }
+         while (NavX.getNavXAngle() > 0 && isOperatorControl()){
+          frc.robot.subsystems.Drivetrain.leftVictorMaster.set(-rotateSpeedSlow);
+          frc.robot.subsystems.Drivetrain.rightVictorMaster.set(-rotateSpeedSlow);
+         }
+      }
+    } else{
+      frc.robot.subsystems.Drivetrain.drive.arcadeDrive(Robot.oi.getJoystickY(), Robot.oi.getJoystickX());
+    }
   }
 
   @Override

@@ -15,4 +15,7 @@ public class RobotMap {
 	//Joysticks USB
 	public static int xbox = 0;
 
+	//Buttons
+	public static int gyroDrive = 1;
+
 }
